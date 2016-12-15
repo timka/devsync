@@ -2,25 +2,32 @@ import sublime
 import sublime_plugin
 import subprocess
 
+DEBUG_MODE = False
+
+def debug(*args, **kw):
+    if DEBUG_MODE:
+        return print(*args, **kw)
 
 class DevSyncCommand(sublime_plugin.EventListener):
     def on_post_save(self, view):
         settings = sublime.load_settings('DevSync.sublime-settings')
         pathMaps = settings.get('pathMapping')
-        debug = settings.get('debugMode')
+        DEBUG_MODE = settings.get('debugMode')
 
-        if (debug):
-            print("==== Starting DevSync Debugging Ouput ====")
+
+        debug("==== Starting DevSync Debugging Ouput ====")
 
         # Get the current file path and determine if it is in
         # the user's pathMapping array
         view = sublime.active_window().active_view()
         localPath = view.file_name() or ''
+        debug('localPath: {}'.format(localPath))
+
         foundMap = None
         for pathMap in pathMaps:
+            
             if (pathMap["source"] in localPath):
-                if (debug):
-                    print('Found sync mapping.')
+                debug('Found sync mapping.')
                 foundMap = True
                 # replace the src path with dest path
                 destPath = localPath.replace(pathMap["source"], pathMap["destination"])
@@ -77,19 +84,17 @@ class DevSyncCommand(sublime_plugin.EventListener):
                         copyCmd = 'copy';
 
 
-                    if (debug):
-                        print("Executing copy command: " + copyCmd + " " + localPath + " " + destPath)
+                    debug("Executing copy command: " + copyCmd + " " + localPath + " " + destPath)
 
                     # copy the file
                     try:
                         subprocess.check_output(copyCmd + " " + localPath + " " + destPath, stderr=subprocess.STDOUT, shell=True)
                     except subprocess.CalledProcessError as e:
                         sublime.error_message(str(e.output.decode("utf-8")))
-        if (foundMap is None and debug):
-            print("No source configured for this file.")
+        if (foundMap is None):
+            debug("No source configured for this file.")
 
-        if (debug):
-            print("==== Done DevSync Debugging Ouput ====")
+        debug("==== Done DevSync Debugging Ouput ====")
 
 
 class devSyncCommand(sublime_plugin.TextCommand):
@@ -98,8 +103,8 @@ class devSyncCommand(sublime_plugin.TextCommand):
         pathMaps = settings.get('pathMapping')
         debug = settings.get('debugMode')
 
-        if (debug):
-            print("==== Starting DevSync Debugging Ouput ====")
+
+        debug("==== Starting DevSync Debugging Ouput ====")
 
         # Get the current file path and determine if it is in
         # the user's pathMapping array
@@ -108,8 +113,7 @@ class devSyncCommand(sublime_plugin.TextCommand):
         for pathMap in pathMaps:
             if (pathMap["source"] in localPath):
                 source = pathMap["source"]
-                if (debug):
-                    print('Found sync mapping.')
+                debug('Found sync mapping.')
                 foundMap = True
 
                 # get the name of the project / the base folder
@@ -128,8 +132,8 @@ class devSyncCommand(sublime_plugin.TextCommand):
                     if (settings.get('bashBinary') == 'sh'):
                         command = settings.get('bashBinary') + " \"" + pathMap["bashScript"] + "\"" + " " + folderName
 
-                    if (debug):
-                        print("Executing Bash Script: " + command)
+
+                    debug("Executing Bash Script: " + command)
                     try:
                         subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
                     except subprocess.CalledProcessError as e:
@@ -149,8 +153,8 @@ class devSyncCommand(sublime_plugin.TextCommand):
                         exclude = " --exclude-from=" + settings.get('rsyncExcludes');
 
                     command = settings.get('rsyncBinary') + exclude + " -avz -e " + settings.get('sshBinary') + " " + source + "/. " + hostString + ":" + pathMap["destination"]
-                    if (debug):
-                        print("Executing Rsync command: " + command)
+
+                    debug("Executing Rsync command: " + command)
 
                     try:
                         subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
@@ -170,15 +174,13 @@ class devSyncCommand(sublime_plugin.TextCommand):
 
                     # copy over the project directory and files. Delete the original directory first.
                     try:
-                        if (debug):
-                            print("Executing copy command: " + copyCmd + " " + source + " " + pathMap["destination"])
+                        debug("Executing copy command: " + copyCmd + " " + source + " " + pathMap["destination"])
 
                         subprocess.check_output(copyCmd + " " + source + " " + pathMap["destination"], stderr=subprocess.STDOUT, shell=True)
                     except subprocess.CalledProcessError as e:
                         sublime.error_message(str(e.output.decode("utf-8")))
 
-        if (foundMap is None and debug):
-            print("No source configured for this file.")
+        if (foundMap is None):
+            debug("No source configured for this file.")
 
-        if (debug):
-            print("==== Done DevSync Debugging Ouput ====")
+        debug("==== Done DevSync Debugging Ouput ====")
