@@ -14,7 +14,7 @@ class DevSyncCommand(sublime_plugin.EventListener):
 
         # Get the current file path and determine if it is in
         # the user's pathMapping array
-        localPath = view.file_name()
+        localPath = view.file_name() or ''
         foundMap = None
         for pathMap in pathMaps:
             if (pathMap["source"] in localPath):
