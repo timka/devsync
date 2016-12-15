@@ -12,7 +12,7 @@ class DevSyncCommand(sublime_plugin.EventListener):
     def on_post_save(self, view):
         settings = sublime.load_settings('DevSync.sublime-settings')
         pathMaps = settings.get('pathMapping')
-        DEBUG_MODE = settings.get('debugMode')
+        globals()['DEBUG_MODE'] = settings.get('debugMode')
 
 
         debug("==== Starting DevSync Debugging Ouput ====")
@@ -101,7 +101,7 @@ class devSyncCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         settings = sublime.load_settings('DevSync.sublime-settings')
         pathMaps = settings.get('pathMapping')
-        debug = settings.get('debugMode')
+        globals()['DEBUG_MODE'] = settings.get('debugMode')
 
 
         debug("==== Starting DevSync Debugging Ouput ====")
