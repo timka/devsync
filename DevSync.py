@@ -154,8 +154,16 @@ class devSyncCommand(sublime_plugin.TextCommand):
                     exclude = "";
                     if (settings.get('rsyncExcludes')):
                         exclude = " --exclude-from=" + settings.get('rsyncExcludes');
+                    
+                    debug("" + command)
 
-                    command = settings.get('rsyncBinary') + exclude + " -avz -e " + settings.get('sshBinary') + " " + source + "/. " + hostString + ":" + pathMap["destination"]
+                    command = settings.get('rsyncBinary')
+                    command += exclude
+                    command += " -avz -e "
+                    command += settings.get('sshBinary')
+                    command += " " + source + "/. "
+                    command += hostString + ":"
+                    command += pathMap["destination"]
 
                     debug("Executing Rsync command: " + command)
 
