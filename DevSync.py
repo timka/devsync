@@ -108,7 +108,10 @@ class devSyncCommand(sublime_plugin.TextCommand):
 
         # Get the current file path and determine if it is in
         # the user's pathMapping array
-        localPath = self.view.file_name()
+        view = sublime.active_window().active_view()
+        localPath = view.file_name() or ''
+        debug('localPath: {}'.format(localPath))
+
         foundMap = None
         for pathMap in pathMaps:
             if (pathMap["source"] in localPath):
