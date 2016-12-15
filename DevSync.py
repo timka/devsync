@@ -11,6 +11,7 @@ def debug(*args, **kw):
 class DevSyncCommand(sublime_plugin.EventListener):
     def on_post_save(self, view):
         settings = sublime.load_settings('DevSync.sublime-settings')
+        debug("settings: {}".format(settings))
         pathMaps = settings.get('pathMapping')
         globals()['DEBUG_MODE'] = settings.get('debugMode')
 
