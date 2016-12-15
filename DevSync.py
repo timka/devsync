@@ -155,8 +155,6 @@ class devSyncCommand(sublime_plugin.TextCommand):
                     if (settings.get('rsyncExcludes')):
                         exclude = " --exclude-from=" + settings.get('rsyncExcludes');
                     
-                    debug("" + command)
-
                     command = settings.get('rsyncBinary')
                     command += exclude
                     command += " -avz -e "
